@@ -40,13 +40,13 @@ def printtul(color):
         if color == "DARKGREEN":
             fgh = (0, 255 - bright, 0)
         if color == "DARKBLUE":
-                    fgh = (0, 0, 255 - bright)
+            fgh = (0, 0, 255 - bright)
         if color == "DARKFIOL":
-                    fgh = (255 - bright - 18, 0, 255 - bright)
+            fgh = (255 - bright - 18, 0, 255 - bright)
         if color == "DARKWHITE":
-                    fgh = (255 - bright, 255 - bright, 255 - bright)
+            fgh = (255 - bright, 255 - bright, 255 - bright)
         if color == "DARKYELLOW":
-                    fgh = (255 - bright, 255 - bright, 0)
+            fgh = (255 - bright, 255 - bright, 0)
         dy = snak[i][0] * 24
         dx = snak[i][1] * 24
         pygame.draw.rect(sc, fgh, (dx, dy, 24, 24))
@@ -85,7 +85,8 @@ printtext('press esc to pause game', 30, 240, 300)
 printtext('Start game: enter', 50, 240, 380)
 #И выводим их
 pygame.display.update()
-FPS = 7
+#FPS EASY MODE
+FPSE = 8
 #Переменная старт отвечает за старт игры при нажатии enter
 start = False
 while True:
@@ -108,6 +109,8 @@ while True:
                 snake[p].append("o")
         #Кидаем на поле голову змейки
         snake[9][9] = "x"
+        gk = 9
+        gp = 9
         #dvizh отвечает на вектор движения
         dvizh = 0
         #Эта переменная отвечает за спавн яблок
@@ -134,31 +137,32 @@ while True:
         golova = GREEN
         #Отвечает за паузу
         stopgame = False
+        #FPS
+        FPS = 8
         #начало игры
         while True:
             #Заполняем экран серым
             sc.fill(GRAY)
-            #Переменная отвечающая за исправления бага со смертью
-            press = False
             #Все кнопки и что они делают
+            press = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_w or event.key == pygame.K_UP:
-                        if not dvizh == 3 and not press:
+                        if not snake[gk - 1][gp] == "z":
                             dvizh = 1
                             press = True
                     if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                        if not dvizh == 4 and not press:
+                        if not snake[gk][gp + 1] == "z":
                             dvizh = 2
                             press = True
                     if event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                        if not dvizh == 1 and not press:
+                        if not snake[gk + 1][gp] == "z":
                             dvizh = 3
                             press = True
                     if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                        if not dvizh == 2 and not press:
+                        if not snake[gk][gp - 1] == "z":
                             dvizh = 4
                             press = True
                     if event.key == pygame.K_ESCAPE:
@@ -192,9 +196,13 @@ while True:
                             snakeref = "default"
                     if event.key == pygame.K_SPACE:
                         if mode == "hard":
+                            mode = "superhard"
+                            FPS = 8
+                        elif mode == "superhard":
                             mode = "easy"
-                        else:
+                        elif mode == "easy":
                             mode = "hard"
+                        
             #добавление голов в список голов разного времени
             for i in range(len(snake)):
                 for j in range(len(snake[i])):
@@ -219,13 +227,14 @@ while True:
                 if snake[e][ee] == "o":
                     snake[e][ee] = "a"
                     apple = False
-            if mode == "hard":
+                FPS += 0.5
+                tall += 1
+            if not mode == "easy":
                 #Движение смерть и поедание яблок
                 if dvizh == 1:
                     if (gk - 1) == -1 or snake[gk - 1][gp] == "z":
                         died = True
                     if not died and snake[gk - 1][gp] == "a":
-                        tall += 1
                         apple = True
                     if not died:
                         snake[gk - 1][gp] = "x"
@@ -234,7 +243,6 @@ while True:
                     if (gp + 1) == 20 or snake[gk][gp + 1] == "z":
                         died = True
                     if not died and snake[gk][gp + 1] == "a":
-                        tall += 1
                         apple = True
                     if not died:
                         snake[gk][gp + 1] = "x"
@@ -243,7 +251,6 @@ while True:
                     if (gk + 1) == 20 or snake[gk + 1][gp] == "z":
                         died = True
                     if not died and snake[gk + 1][gp] == "a":
-                        tall += 1
                         apple = True
                     if not died:
                         snake[gk + 1][gp] = "x"
@@ -252,7 +259,6 @@ while True:
                     if (gp - 1) == -1 or snake[gk][gp - 1] == "z":
                         died = True
                     if not died and snake[gk][gp - 1] == "a":
-                        tall += 1
                         apple = True
                     if not died:
                         snake[gk][gp - 1] = "x"
@@ -263,7 +269,6 @@ while True:
                     if snake[gk - 1][gp] == "z":
                         died = True
                     if not died and snake[gk - 1][gp] == "a":
-                        tall += 1
                         apple = True
                     if (gk - 1) == -1:
                         if snake[19][gp] == "z":
@@ -277,7 +282,6 @@ while True:
                     if not (gp + 1) == 20 and snake[gk][gp + 1] == "z":
                         died = True
                     if not (gp + 1) == 20 and not died and snake[gk][gp + 1] == "a":
-                        tall += 1
                         apple = True
                     if (gp + 1) == 20:
                         if snake[gk][0] == "z":
@@ -291,7 +295,6 @@ while True:
                     if not (gk + 1) == 20 and snake[gk + 1][gp] == "z":
                         died = True
                     if not (gk + 1) == 20 and not died and snake[gk + 1][gp] == "a":
-                        tall += 1
                         apple = True
                     if (gk + 1) == 20:
                         if snake[0][gp] == "z":
@@ -305,7 +308,6 @@ while True:
                     if not (gp - 1) == -1 and snake[gk][gp - 1] == "z":
                         died = True
                     if not (gp - 1) == -1 and not died and snake[gk][gp - 1] == "a":
-                        tall += 1
                         apple = True
                     if (gp - 1) == -1:
                         if snake[gk][19] == "z":
@@ -322,7 +324,7 @@ while True:
                 soundmove = 1
             if soundmove > 7:
                 soundmove = 6
-            if dvizh == 1 or dvizh == 2 or dvizh == 3 or dvizh == 4:
+            if not dvizh == 0:
                 if not died and not apple and soundmove == 7:
                     pygame.mixer.music.load('move.mp3')
                     pygame.mixer.music.play(0)
@@ -343,6 +345,7 @@ while True:
                                 z += 1
                         if z == tall:
                             snake[j][h] = "o"
+            
             #Вывод змейки и яблока
             printsnake("x", golova)
             if snakeref == "gradient":
@@ -373,4 +376,8 @@ while True:
             #Отрисовка всего кадра который мы создали выше
             pygame.display.update()
             #Ждём пока наступит след кадр
-            clock.tick(FPS)
+            if mode == "superhard":
+                clock.tick(FPS)
+            else:
+                clock.tick(FPSE)
+
